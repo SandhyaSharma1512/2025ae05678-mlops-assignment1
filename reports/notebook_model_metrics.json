@@ -1,0 +1,28 @@
+{
+  "selected_model": "logistic_regression",
+  "selection_metric": "mean cross-validation ROC-AUC",
+  "results": [
+    {
+      "model": "logistic_regression",
+      "cv_accuracy_mean": 0.8139455782312925,
+      "cv_precision_mean": 0.8153732797466813,
+      "cv_recall_mean": 0.773913043478261,
+      "cv_roc_auc_mean": 0.8963053050009572,
+      "test_accuracy": 0.8688524590163934,
+      "test_precision": 0.8125,
+      "test_recall": 0.9285714285714286,
+      "test_roc_auc": 0.9502164502164503
+    },
+    {
+      "model": "random_forest",
+      "cv_accuracy_mean": 0.7930272108843538,
+      "cv_precision_mean": 0.7895182072829131,
+      "cv_recall_mean": 0.7557312252964428,
+      "cv_roc_auc_mean": 0.8828361654448612,
+      "test_accuracy": 0.9180327868852459,
+      "test_precision": 0.8709677419354839,
+      "test_recall": 0.9642857142857143,
+      "test_roc_auc": 0.9545454545454546
+    }
+  ]
+}
