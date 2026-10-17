@@ -9,6 +9,7 @@ data/processed/*
 !data/processed/.gitkeep
 models/*
 !models/.gitkeep
+!models/model.joblib
 mlruns/
 reports/eda/*
 !reports/eda/.gitkeep
