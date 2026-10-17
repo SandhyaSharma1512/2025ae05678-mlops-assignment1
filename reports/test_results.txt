@@ -18,8 +18,8 @@ tests/test_predict.py::test_predict_one_returns_prediction_and_confidence PASSED
     from starlette.testclient import TestClient as TestClient  # noqa
 
 tests/test_data.py::test_normalize_columns_binarizes_target
-  C:\Users\sandh\Downloads\Sem3\MLOPS\Assignment\2025ae05860-mlops-assignment1\src\heart_disease\data.py:33: FutureWarning: errors='ignore' is deprecated and will raise in a future version. Use to_numeric without passing `errors` and catch exceptions explicitly instead
+  C:\Users\sandh\Downloads\Sem3\MLOPS\Assignment\2025ae05678-mlops-assignment1\src\heart_disease\data.py:33: FutureWarning: errors='ignore' is deprecated and will raise in a future version. Use to_numeric without passing `errors` and catch exceptions explicitly instead
     frame[col] = pd.to_numeric(frame[col], errors="ignore")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 5 passed, 2 warnings in 1.87s ========================
+======================== 5 passed, 2 warnings in 2.22s ========================
