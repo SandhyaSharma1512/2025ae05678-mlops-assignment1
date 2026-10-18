@@ -1,69 +1,66 @@
-"""FastAPI model-serving API with structured logs and Prometheus metrics."""
-from __future__ import annotations
-
-import logging
-import time
 from pathlib import Path
-from typing import Optional
 
+import joblib
+import pandas as pd
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from prometheus_client import Counter, Histogram, make_asgi_app
+from pydantic import BaseModel
 
-from heart_disease.predict import load_model, predict_one, MODEL_PATH
+app = FastAPI(
+    title="Heart Disease Prediction API",
+    version="1.0.0"
+)
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
-logger = logging.getLogger("heart_disease_api")
+MODEL_PATH = Path("models/final_model.pkl")
+PIPELINE_PATH = Path("models/preprocessing_pipeline.pkl")
 
-REQUEST_COUNT = Counter("prediction_requests_total", "Number of prediction requests", ["endpoint", "status"])
-PREDICTION_LATENCY = Histogram("prediction_latency_seconds", "Prediction request latency in seconds")
-
-app = FastAPI(title="Heart Disease Risk Classifier", version="1.0.0",
-              description="Educational demo only; not for clinical use.")
-app.mount("/metrics", make_asgi_app())
+model = joblib.load(MODEL_PATH)
+preprocessing_pipeline = joblib.load(PIPELINE_PATH)
 
 
-class PatientFeatures(BaseModel):
-    age: float = Field(..., ge=0, le=120)
-    sex: int = Field(..., ge=0, le=1)
-    cp: int = Field(..., ge=0, le=3)
-    trestbps: float = Field(..., ge=0, le=300)
-    chol: float = Field(..., ge=0, le=800)
-    fbs: int = Field(..., ge=0, le=1)
-    restecg: int = Field(..., ge=0, le=2)
-    thalach: float = Field(..., ge=0, le=300)
-    exang: int = Field(..., ge=0, le=1)
-    oldpeak: float = Field(..., ge=-10, le=20)
-    slope: int = Field(..., ge=0, le=2)
-    ca: float = Field(..., ge=0, le=4)
-    thal: float = Field(..., ge=0, le=7)
+class PatientData(BaseModel):
+    age: float
+    sex: int
+    cp: int
+    trestbps: float
+    chol: float
+    fbs: int
+    restecg: int
+    thalach: float
+    exang: int
+    oldpeak: float
+    slope: int
+    ca: int
+    thal: int
+
+
+@app.get("/")
+def root():
+    return {"message": "Heart Disease Prediction API running"}
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model_loaded": MODEL_PATH.exists()}
+    return {"status": "healthy"}
 
 
 @app.post("/predict")
-def predict(features: PatientFeatures):
-    start = time.perf_counter()
+def predict(patient: PatientData):
     try:
-        model = load_model()
-        result = predict_one(features.model_dump(), model=model)
-        REQUEST_COUNT.labels(endpoint="/predict", status="success").inc()
-        logger.info("prediction_success prediction=%s confidence=%.4f", result["prediction"], result["confidence"])
+        df = pd.DataFrame([patient.model_dump()])
+        prediction = int(model.predict(df)[0])
+        confidence = (
+            float(model.predict_proba(df).max())
+            if hasattr(model, "predict_proba")
+            else 1.0
+        )
+
         return {
-            **result,
-            "label": "disease_present" if result["prediction"] == 1 else "disease_absent",
-            "disclaimer": "Educational demonstration only; not medical advice.",
+            "prediction": prediction,
+            "confidence": round(confidence, 4)
         }
-    except FileNotFoundError as exc:
-        REQUEST_COUNT.labels(endpoint="/predict", status="model_missing").inc()
-        logger.exception("model_artifact_missing")
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-    except Exception as exc:
-        REQUEST_COUNT.labels(endpoint="/predict", status="error").inc()
-        logger.exception("prediction_failed")
-        raise HTTPException(status_code=500, detail="Prediction failed.") from exc
-    finally:
-        PREDICTION_LATENCY.observe(time.perf_counter() - start)
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

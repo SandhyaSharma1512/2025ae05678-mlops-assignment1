@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ src/
 COPY models/ models/
 
+ENV PYTHONPATH=/app/src
 # Expose the port the app runs on
 EXPOSE 8000
 
