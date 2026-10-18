@@ -1,11 +1,21 @@
-FROM python:3.11-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+# Use an official Python image as the base image
+FROM python:3.9-slim
+
+# Set the working directory in the container
 WORKDIR /app
-COPY requirements.txt pyproject.toml README.md ./
-COPY src ./src
-RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir -e .
-COPY models ./models
+
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code into the container
+COPY src/ src/
+COPY models/ models/
+
+# Expose the port the app runs on
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+
+# Command to run the FastAPI app with Uvicorn
 CMD ["uvicorn", "heart_disease.api:app", "--host", "0.0.0.0", "--port", "8000"]
