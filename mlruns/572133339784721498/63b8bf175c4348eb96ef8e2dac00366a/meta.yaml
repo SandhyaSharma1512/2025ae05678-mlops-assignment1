@@ -1,0 +1,15 @@
+artifact_uri: file:///home/s2025ae05678/workspace/2025ae05678-mlops-assignment1/mlruns/572133339784721498/63b8bf175c4348eb96ef8e2dac00366a/artifacts
+end_time: 1792322612564
+entry_point_name: ''
+experiment_id: '572133339784721498'
+lifecycle_stage: active
+run_id: 63b8bf175c4348eb96ef8e2dac00366a
+run_name: logistic_regression
+run_uuid: 63b8bf175c4348eb96ef8e2dac00366a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1792322606094
+status: 3
+tags: []
+user_id: s2025ae05678
